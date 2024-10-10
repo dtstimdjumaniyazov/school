@@ -23,15 +23,15 @@ urlpatterns = [
 
     #For Group1
     path('groups/', GroupListCreateView.as_view(), name='group-list-create'),
-    path('gorups/<int:pk>', Group1DetailView.as_view(), name='group-detail'),
+    path('gorups/<int:pk>/', Group1DetailView.as_view(), name='group-detail'),
 
     #For Students
     path('students/', StudentListCreateView.as_view(), name='students-list-create'),
-    path('students/<int:pk>', StudentDetailView.as_view(), name='student-detail'),
+    path('students/<int:pk>/', StudentDetailView.as_view(), name='student-detail'),
 
     #For Subject
     path('subjects/', SubjectListCreateView.as_view(), name='subject-list-create'),
-    path('subjects/<int:pk>', SubjectDetailView.as_view(), name='subject-detail'),
+    path('subjects/<int:pk>/', SubjectDetailView.as_view(), name='subject-detail'),
 
     #For Grade
     path('grades/', GradeListCreateView.as_view(), name='grade-list-create'),

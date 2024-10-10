@@ -26,8 +26,21 @@ class RoleBasePermission(BasePermission):
             return False
 
 
-        # Student can only view grades and other readonly information
+        # Student: Read-only for their own grades, and can view subjects, and students.
         elif user.role == 'student':
-            if view_name in ['GradeListCreateView', 'Group1ListCreateView', 'SubjectListCreateView'] and request.method in SAFE_METHODS:
+            if view_name in ['StudentListCreateView', 'StudentDetailView', 'SubjectListCreateView', 'SubjectDetailView'] and request.method in SAFE_METHODS:
                 return True
+            # Grades: The student can see only their own grades (object-level permission)
+            elif view_name in ['GradeDetailView', 'GradeListCreateView'] and request.method in SAFE_METHODS:
+                return True  # Allow basic read access, but we'll filter in `has_object_permission`.
+
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+
+        # Ensure that a student can only see their own grades
+        if user.role == 'student' and hasattr(obj, 'student'):
+            return obj.student == user  # Allow access only if the grade belongs to the current student
+        
         return False

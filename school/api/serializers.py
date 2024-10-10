@@ -74,3 +74,8 @@ class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
         fields = ['id', 'student', 'subject', 'grade']
+
+    def validate_grade(self, value):
+        if value <0 or value > 100:
+            raise serializers.ValidationError("Оценка проставляется от 0 до 100")
+        return value

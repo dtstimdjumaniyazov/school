@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -48,3 +49,15 @@ class Grade(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.subject} - {self.grade}"
+    
+    def clean(self):
+        
+        # Ensure the grade is between 0 and 100
+        if self.grade < 0 or self.grade > 100:
+            raise ValidationError('Grade must be between 0 and 100.')
+    
+    def save(self, *args, **kwargs):
+        
+        # Call the full_clean method before saving to trigger validation
+        self.full_clean()
+        super(Grade, self).save(*args, **kwargs)
