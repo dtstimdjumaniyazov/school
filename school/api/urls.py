@@ -4,7 +4,8 @@ from school.api.views import (
     GroupListCreateView, Group1DetailView,
     StudentListCreateView, StudentDetailView,
     SubjectListCreateView, SubjectDetailView,
-    GradeListCreateView, GradeDetailView
+    GradeListCreateView, GradeDetailView,
+    GroupAverageGradeView
     )
 
 from rest_framework_simplejwt.views import (
@@ -23,7 +24,7 @@ urlpatterns = [
 
     #For Group1
     path('groups/', GroupListCreateView.as_view(), name='group-list-create'),
-    path('gorups/<int:pk>/', Group1DetailView.as_view(), name='group-detail'),
+    path('groups/<int:pk>/', Group1DetailView.as_view(), name='group-detail'),
 
     #For Students
     path('students/', StudentListCreateView.as_view(), name='students-list-create'),
@@ -36,4 +37,7 @@ urlpatterns = [
     #For Grade
     path('grades/', GradeListCreateView.as_view(), name='grade-list-create'),
     path('grades/<int:pk>/', GradeDetailView.as_view(), name='grade-detail'),
+
+    #For average grade for each subject at define group
+    path('groups/<int:group_id>/average-grades/', GroupAverageGradeView.as_view(), name='group-average-grades'),
 ]
