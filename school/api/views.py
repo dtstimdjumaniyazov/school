@@ -16,6 +16,12 @@ class CustomUserListCreateView(generics.ListCreateAPIView):
     serializer_class = CustomUserSerializer
     permission_classes = [RoleBasePermission]
 
+    def get_queryset(self):
+        role = self.request.query_params.get('role')
+        if role:
+            return CustomUser.objects.filter(role=role)
+        return super().get_queryset()
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -51,6 +57,12 @@ class GroupListCreateView(generics.ListCreateAPIView):
     serializer_class = Group1Serializer
     permission_classes = [RoleBasePermission]
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'teacher':
+            return Group1.objects.filter(teacher=user).prefetch_related('student__user', 'teacher')
+        return Group1.objects.all().prefetch_related('student__user', 'teacher')
+
 
 class Group1DetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Group1.objects.all()
@@ -75,6 +87,15 @@ class SubjectListCreateView(generics.ListCreateAPIView):
     serializer_class = SubjectSerializer
     permission_classes = [RoleBasePermission]
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'teacher':
+            return Subject.objects.filter(teacher=user)
+        elif user.role == 'student':
+            student = Student.objects.get(user=user)
+            return Subject.objects.filter(groups__student=student)
+        return Subject.objects.all()
+
 
 class SubjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Subject.objects.all()
@@ -89,10 +110,12 @@ class GradeListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'student':
+        if user.role == 'teacher':
+            return Grade.objects.filter(subject__teacher=user).select_related('student__user', 'subject__teacher')
+        elif user.role == 'student':
             student = Student.objects.get(user=user)
-            return Grade.objects.filter(student=student)
-        return Grade.objects.all()
+            return Grade.objects.filter(student=student).select_related('student__user', 'subject__teacher')
+        return Grade.objects.all().select_related('student__user', 'subject__teacher')
 
 
 class GradeDetailView(generics.RetrieveUpdateDestroyAPIView):

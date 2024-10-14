@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
 
+    #In order to interact with Front-end
     'corsheaders',
 ]
 
@@ -54,7 +55,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    
+    #In order to interact with Front-end
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
@@ -151,8 +153,11 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+
+#In order to interact with Front-end
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080',
 ]
 
+#In order to interact with Front-end
 CORS_ALLOW_ALL_ORIGINS = True

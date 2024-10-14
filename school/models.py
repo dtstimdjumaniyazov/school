@@ -14,7 +14,7 @@ class CustomUser(AbstractUser):
 
 class Group1(models.Model):
     name = models.CharField(max_length=100)
-    student = models.ManyToManyField('Student', related_name='groups')
+    student = models.ManyToManyField('Student', related_name='groups', blank=True)
     teacher = models.ForeignKey('CustomUser', limit_choices_to={'role': 'teacher'}, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -38,8 +38,6 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.name
-    
-    
 
 
 class Grade(models.Model):

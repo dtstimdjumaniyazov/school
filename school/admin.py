@@ -5,32 +5,39 @@ from .models import CustomUser, Group1, Student, Subject, Grade
 class CustomUserAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        if request.user.is_superuser:
+        if request.user.groups.filter(name='superuser').exists():
             return qs
-        if request.user.role == 'director':
-            return qs
-        elif request.user.role == 'teacher':
-            return qs.filter(role='teacher')
-        elif request.user.role == 'student':
-            return qs.filter(id=request.user.id)
+        elif request.user.groups.filter(name='groupDirector').exists():
+            return qs.filter(role__in=['teacher', 'student'])
+        elif request.user.groups.filter(name='teacherGroup').exists():
+            return qs.filter(role='student')
         return qs.none()
 
     def has_add_permission(self, request):
-        if request.user.is_superuser:
+        if request.user.groups.filter(name='superuser').exists():
             return True
-        if request.user.role == 'director':
+        elif request.user.groups.filter(name='groupDirector').exists():
             return True
         return False
 
     def has_change_permission(self, request, obj=None):
-        if request.user.is_superuser or request.user.role == 'director':
+        if request.user.groups.filter(name='superuser').exists():
             return True
+        if request.user.groups.filter(name='groupDirector').exists():
+            return obj and obj.role in ['teacher', 'student']
         return False
 
     def has_delete_permission(self, request, obj=None):
-        if request.user.is_superuser or request.user.role == 'director':
+        if request.user.groups.filter(name='superuser').exists():
             return True
+        if request.user.groups.filter(name='groupDirector').exists():
+            return obj and obj.role in ['teacher', 'student']
         return False
+    
+    def save_model(self, request, obj, form, change):
+        if form.cleaned_data.get('password'):
+            obj.set_password(form.cleaned_data['password'])
+        super().save_model(request, obj, form, change)
 
 class Group1Admin(admin.ModelAdmin):
     def get_queryset(self, request):
@@ -116,4 +123,4 @@ admin.site.register(Student, StudentAdmin)
 admin.site.register(Subject)
 admin.site.register(Grade, GradeAdmin)
 
-admin.site.unregister(Group)
+# admin.site.unregister(Group)
